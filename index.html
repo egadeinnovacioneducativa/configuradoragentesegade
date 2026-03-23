@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Prompts Académicos - Posgrado</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        .card {
+            border: 1px solid #e5e5e5;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-custom:checked {
+            background-color: #000;
+            border-color: #000;
+        }
+
+        .prompt-container {
+            background-color: #f9f9f9;
+            border-left: 4px solid #000;
+            white-space: pre-wrap;
+        }
+
+        .btn-copy {
+            background-color: #000;
+            color: #fff;
+            transition: background-color 0.2s;
+        }
+
+        .btn-copy:hover {
+            background-color: #333;
+        }
+
+        .input-field {
+            border-bottom: 2px solid #e5e5e5;
+            transition: border-color 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #000;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="mb-12 flex flex-col items-center md:items-start">
+            <img src="https://image.admisiones.tec.mx/lib/fe2b11747364057f721176/m/1/b910ad21-1913-4ce0-8f35-38c908814125.png" 
+                 alt="Logo Institucional" 
+                 class="h-16 mb-6 object-contain"
+                 onerror="this.style.display='none'">
+            <h1 class="text-3xl font-light tracking-tight mb-2">Configurador de Agentes Académicos</h1>
+            <p class="text-gray-500 max-w-2xl text-sm md:text-base leading-relaxed">
+                Seleccione los bloques estructurales y complete la información específica de su curso para construir un prompt técnico de alta precisión para su asistente virtual.
+            </p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            
+            <!-- Controls Section -->
+            <section class="space-y-8">
+                <!-- Variables -->
+                <div>
+                    <h2 class="text-xs font-bold uppercase tracking-widest mb-6 border-b pb-2">1. Datos del Curso</h2>
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">NOMBRE DE LA ASIGNATURA</label>
+                            <input type="text" id="materia" placeholder="Ej. Liderazgo Global" 
+                                   class="w-full input-field py-2 bg-transparent text-lg" 
+                                   oninput="updatePrompt()">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">ESPECIALIDAD / HABILIDADES</label>
+                            <input type="text" id="especialidad" placeholder="Ej. Pensamiento crítico y ética" 
+                                   class="w-full input-field py-2 bg-transparent text-lg"
+                                   oninput="updatePrompt()">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">NOMBRE DEL ARCHIVO SYLLABUS</label>
+                            <input type="text" id="syllabus" placeholder="Ej. Syllabus_V1_2024.pdf" 
+                                   class="w-full input-field py-2 bg-transparent text-lg"
+                                   oninput="updatePrompt()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Block Selection -->
+                <div>
+                    <h2 class="text-xs font-bold uppercase tracking-widest mb-6 border-b pb-2">2. Estructura del Prompt</h2>
+                    <div class="space-y-4">
+                        <label class="flex items-start cursor-pointer group">
+                            <input type="checkbox" id="checkBase" checked class="mt-1 checkbox-custom" onchange="updatePrompt()">
+                            <div class="ml-3">
+                                <span class="block font-semibold text-sm">Bloque Base</span>
+                                <span class="text-xs text-gray-500 italic">Identidad, rol de consejero y lineamientos éticos.</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start cursor-pointer group">
+                            <input type="checkbox" id="checkPerfil" checked class="mt-1 checkbox-custom" onchange="updatePrompt()">
+                            <div class="ml-3">
+                                <span class="block font-semibold text-sm">Perfil Especializado</span>
+                                <span class="text-xs text-gray-500 italic">Habilidades técnicas añadidas al asistente.</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start cursor-pointer group">
+                            <input type="checkbox" id="checkAdmin" checked class="mt-1 checkbox-custom" onchange="updatePrompt()">
+                            <div class="ml-3">
+                                <span class="block font-semibold text-sm">Administrativo & Syllabus</span>
+                                <span class="text-xs text-gray-500 italic">Manejo de hipervínculos y consultas de cronograma.</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start cursor-pointer group">
+                            <input type="checkbox" id="checkSocratico" checked class="mt-1 checkbox-custom" onchange="updatePrompt()">
+                            <div class="ml-3">
+                                <span class="block font-semibold text-sm">Método Socrático & Modos</span>
+                                <span class="text-xs text-gray-500 italic">Cambio dinámico entre modo facilitador, socrático o rol.</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Output Section -->
+            <section>
+                <div class="sticky top-8">
+                    <h2 class="text-xs font-bold uppercase tracking-widest mb-6">Resultado Final</h2>
+                    <div id="promptOutput" class="prompt-container p-6 text-sm leading-relaxed min-h-[400px]">
+                        <!-- Se llena dinámicamente -->
+                    </div>
+                    
+                    <button onclick="copyToClipboard()" class="w-full mt-6 py-4 btn-copy flex items-center justify-center gap-2 text-sm uppercase tracking-widest font-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M216,40H88a16,16,0,0,0-16,16V72H56A16,16,0,0,0,40,88V216a16,16,0,0,0,16,16H184a16,16,0,0,0,16-16V184h16a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm-32,176H56V88H184V216Zm32-48H200V88a16,16,0,0,0-16-16H88V56H216V168Z"></path></svg>
+                        Copiar Prompt
+                    </button>
+                    <p id="copyFeedback" class="text-center text-xs mt-2 text-gray-400 opacity-0 transition-opacity">¡Copiado al portapapeles!</p>
+                </div>
+            </section>
+        </div>
+        
+        <footer class="mt-20 pt-8 border-t text-center text-xs text-gray-400">
+            Escuela de Posgrado &copy; 2024 - Herramienta de Diseño Instruccional
+        </footer>
+    </div>
+
+    <script>
+        function updatePrompt() {
+            const materia = document.getElementById('materia').value || "[NOMBRE DE LA ASIGNATURA]";
+            const especialidad = document.getElementById('especialidad').value || "[HABILIDADES O ESPECIALIDAD]";
+            const syllabus = document.getElementById('syllabus').value || "[NOMBRE DE ARCHIVO SYLLABUS]";
+            
+            const checkBase = document.getElementById('checkBase').checked;
+            const checkPerfil = document.getElementById('checkPerfil').checked;
+            const checkAdmin = document.getElementById('checkAdmin').checked;
+            const checkSocratico = document.getElementById('checkSocratico').checked;
+
+            let finalPrompt = "";
+
+            if (checkBase) {
+                finalPrompt += `BASE:\nEres un asistente académico virtual experto en la asignatura de ${materia}.\nNo eres un profesor que da clases, sino un consejero que reta supuestos. Responde de manera respetuosa, clara y profesional, basándote únicamente en el contenido autorizado del curso (archivos de syllabus, lecturas y rúbricas oficiales cargados en los archivos del agente). Saluda cordialmente al iniciar, adapta tu tono al estudiante y concluye cada respuesta ofreciendo ayuda adicional con funciones relacionadas.\n\n`;
+            }
+
+            if (checkPerfil) {
+                finalPrompt += `PERFIL ESPECIALIZADO:\nAdemás, tienes las habilidades específicas de ${especialidad}.\n\n`;
+            }
+
+            if (checkAdmin) {
+                finalPrompt += `ADMINISTRATIVO:\nLas cuestiones académicas y administrativas deben consultarse en el archivo ${syllabus}. Respeta los hipervínculos, incluyéndolos solo cuando se soliciten. Al responder preguntas sobre el syllabus, identifica y señala específicamente la semana de trabajo a la que corresponde la consulta.\n\n`;
+            }
+
+            if (checkSocratico) {
+                finalPrompt += `CHATBOT CON MÉTODO SOCRÁTICO:\nUsa las instrucciones especiales del archivo “Prompt método socrático.pdf” para cambiar entre modos.\n\n----\nNota: Agregar como documento fuente de información el archivo “Prompt método socrático.pdf” (AGREGAR ENLACE). Este archivo agregará los modos de operación: modo método socrático (no da una respuesta, sino que hace preguntas al alumno para que llegue a ella; es el modo predefinido); modo facilitador de contenido (cuando se quiere una respuesta directa); y modo simulación o rol (por si se requiere generar una conversación tipo juego de roles).`;
+            }
+
+            document.getElementById('promptOutput').innerText = finalPrompt || "Selecciona al menos un bloque para ver el resultado.";
+        }
+
+        function copyToClipboard() {
+            const text = document.getElementById('promptOutput').innerText;
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = text;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+
+            const feedback = document.getElementById('copyFeedback');
+            feedback.style.opacity = '1';
+            setTimeout(() => {
+                feedback.style.opacity = '0';
+            }, 2000);
+        }
+
+        // Inicializar
+        window.onload = updatePrompt;
+    </script>
+</body>
+</html>
